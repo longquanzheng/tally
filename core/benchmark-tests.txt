@@ -1,0 +1,2 @@
+Benchmark                                    Mode  Cnt     Score    Error   Units
+ScopeImplBenchmark.scopeReportingBenchmark  thrpt   10  1151.460 ± 53.541  ops/ms

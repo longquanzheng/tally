@@ -20,6 +20,8 @@
 
 package com.uber.m3.tally;
 
+import com.uber.m3.tally.sanitizers.ScopeSanitizerBuilder;
+import com.uber.m3.tally.sanitizers.ValidCharacters;
 import com.uber.m3.util.Duration;
 import com.uber.m3.util.ImmutableMap;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -36,33 +38,33 @@ import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Fork(value = 2, jvmArgsAppend = { "-server", "-XX:+UseG1GC" })
+@Fork(value = 2, jvmArgsAppend = {"-server", "-XX:+UseG1GC"})
 public class ScopeImplBenchmark {
 
     private static final DurationBuckets EXPONENTIAL_BUCKETS = DurationBuckets.linear(Duration.ofMillis(1), Duration.ofMillis(10), 128);
 
     private static final String[] COUNTER_NAMES = {
-        "first-counter",
-        "second-counter",
-        "third-counter",
-        "fourth-counter",
-        "fifth-counter",
+            "first-counter",
+            "second-counter",
+            "third-counter",
+            "fourth-counter",
+            "fifth-counter",
     };
 
     private static final String[] GAUGE_NAMES = {
-        "first-gauge",
-        "second-gauge",
-        "third-gauge",
-        "fourth-gauge",
-        "fifth-gauge",
+            "first-gauge",
+            "second-gauge",
+            "third-gauge",
+            "fourth-gauge",
+            "fifth-gauge",
     };
 
     private static final String[] HISTOGRAM_NAMES = {
-        "first-histogram",
-        "second-histogram",
-        "third-histogram",
-        "fourth-histogram",
-        "fifth-histogram",
+            "first-histogram",
+            "second-histogram",
+            "third-histogram",
+            "fourth-histogram",
+            "fifth-histogram",
     };
 
     @Benchmark
@@ -86,6 +88,13 @@ public class ScopeImplBenchmark {
                                             "application", "some-application",
                                             "instance", "some-instance"
                                     )
+                            )
+                            .sanitizer(
+                                    new ScopeSanitizerBuilder()
+                                            .withNameValidCharacters(ValidCharacters.of(null, ValidCharacters.UNDERSCORE_CHARACTERS))
+                                            .withTagKeyValidCharacters(ValidCharacters.of(null, ValidCharacters.UNDERSCORE_CHARACTERS))
+                                            .withTagValueValidCharacters(ValidCharacters.of(null, ValidCharacters.UNDERSCORE_CHARACTERS))
+                                            .build()
                             )
                             .reportEvery(Duration.MAX_VALUE);
 
